@@ -26,17 +26,21 @@ execRule: EXEC SQL sqlCode END_EXEC
 
 nonExecRule: host_variable_rule;
 
-host_variable_rule: (result_set_locator_host_variable | binary_host_variable);
+host_variable_rule: (result_set_locator_host_variable | binary_host_variable | binary_host_variable_array);
 
 result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
 
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | VARBINARY LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR  | BINARY VARYING;
 
+binary_host_variable_array: dbs_level_02_48 entry_name SQL TYPE IS binary_host_variable_type host_variable_array_times;
+
 binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
+host_variable_array_times: OCCURS host_variable_array_size TIMES?;
+host_variable_array_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32767);};
 
 entry_name : (FILLER |dbs_host_names);
 sqlCode
@@ -1817,4 +1821,5 @@ dbs_char_a: T=(NONNUMERICLITERAL | IDENTIFIER)  {validateValue($T.text, "A");};
 dbs_char_n: T=(NONNUMERICLITERAL | IDENTIFIER) {validateValue($T.text, "N");};
 dbs_char_r: T=(NONNUMERICLITERAL | IDENTIFIER) {validateValue($T.text, "R");};
 dbs_level_01: SINGLEDIGIT_1 | DOUBLEDIGIT_1;
+dbs_level_02_48: T=dbs_integerliteral_expanded {validateLength($T.text, "Cobol level", 2); validateIntegerRange($T.start, $T.text, 2, 48);};
 /////
