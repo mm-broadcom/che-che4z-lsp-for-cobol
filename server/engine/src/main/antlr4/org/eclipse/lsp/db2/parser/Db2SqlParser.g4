@@ -26,7 +26,7 @@ execRule: EXEC SQL sqlCode END_EXEC
 
 nonExecRule: host_variable_rule;
 
-host_variable_rule: (result_set_locator_host_variable | binary_host_variable | binary_host_variable_array);
+host_variable_rule: (result_set_locator_host_variable | binary_host_variable | binary_host_variable_array | xml_host_variable_array);
 
 result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
 
@@ -34,6 +34,11 @@ binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_va
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | (VARBINARY | BINARY VARYING) LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR;
 
 binary_host_variable_array: dbs_level_02_48 entry_name SQL TYPE IS binary_host_variable_type host_variable_array_times;
+
+xml_host_variable_array: dbs_level_02_48 entry_name SQL TYPE IS XML AS (blob_clob_file | blob_clob_object ) host_variable_array_times;
+
+blob_clob_object: (BLOB | CLOB | DBCLOB | (BINARY | CHAR | CHARACTER) LARGE OBJECT) LPARENCHAR host_variable_array_size (LENGTH_TYPES)? RPARENCHAR;
+blob_clob_file: ((BLOB | CLOB | DBCLOB) MINUSCHAR FILE);
 
 binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
