@@ -14,8 +14,9 @@
 import * as path from "node:path";
 import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
-import { getProgramNameFromUri } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
+import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
+import { Utils } from "../util/Utils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -41,10 +42,11 @@ export class CopybookURI {
     profileName: string,
     dataset: string,
     downloadFolder: string,
+    source: string = ZOWE_FOLDER,
   ): string {
     return path.join(
       downloadFolder,
-      ZOWE_FOLDER,
+      source,
       COPYBOOKS_FOLDER,
       profileName,
       dataset,
@@ -57,13 +59,16 @@ export class CopybookURI {
    * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
    * connection name needed to download copybooks from mainframe.
    */
-  public static async createPathForCopybookDownloaded(
+  public static createPathForCopybookDownloaded(
     documentUri: string,
     dialectType: string,
     downloadFolder: string,
-  ): Promise<string[]> {
-    const filename = getProgramNameFromUri(documentUri, true);
-    const profile = await ProfileUtils.getProfileNameForCopybook(filename);
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string[] {
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      zoweExplorerApi,
+    );
 
     let result: string[] = [];
     const datasets: string[] = SettingsService.getDsnPath(
@@ -94,5 +99,16 @@ export class CopybookURI {
       );
     }
     return result;
+  }
+
+  public static getEnviromentPath(type: EndevorType, profile: ResolvedProfile) {
+    return path.join(
+      Utils.profileAsString(profile),
+      type.environment,
+      type.stage,
+      type.system,
+      type.subsystem,
+      type.type,
+    );
   }
 }

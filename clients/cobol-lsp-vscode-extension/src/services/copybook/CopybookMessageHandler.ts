@@ -16,8 +16,6 @@ import { SettingsService } from "../Settings";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
-import * as path from "path";
-import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
 
 enum CopybookFolderKind {
   "local",
@@ -25,37 +23,14 @@ enum CopybookFolderKind {
   "downloaded-uss",
 }
 
-export async function resolveCopybookHandler(
-  storagePath: string,
-  documentUri: string,
-  copybookName: string,
-  dialectType: string,
-): Promise<string | undefined> {
-  let result: string | undefined;
-  result = searchCopybook(documentUri, copybookName, dialectType, storagePath);
-  // check in subfolders under .copybooks (copybook downloaded from MF)
-  if (!result) {
-    result = searchCopybookInExtensionFolder(
-      copybookName,
-      await CopybookURI.createPathForCopybookDownloaded(
-        documentUri,
-        dialectType,
-        path.join(storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
-      ),
-      SettingsService.getCopybookExtension(documentUri),
-      storagePath,
-    );
-  }
-  return result;
-}
-
-function searchCopybook(
+export async function searchCopybook(
   documentUri: string,
   copybookName: string,
   dialectType: string,
   storagePath: string,
 ) {
   let result: string | undefined;
+
   for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
     const folderKind = Object.values(CopybookFolderKind)[i];
     const targetFolder = getTargetFolderForCopybook(
@@ -117,20 +92,4 @@ function resolveAllowedExtensions(
     default:
       return SettingsService.getCopybookExtension(documentUri);
   }
-}
-
-export function downloadCopybookHandler(
-  this: any,
-  cobolFileName: string,
-  copybookNames: string[],
-  dialectType: string,
-  quietMode: boolean,
-): string {
-  return this.downloadCopybooks(
-    cobolFileName,
-    copybookNames.map(
-      (copybookName) => new CopybookName(copybookName, dialectType),
-    ),
-    quietMode,
-  );
 }

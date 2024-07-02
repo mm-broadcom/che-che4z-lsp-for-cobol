@@ -12,13 +12,12 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as path from "node:path";
 import * as vscode from "vscode";
-import { FileType } from "vscode";
 import {
   CLEARING_COPYBOOK_CACHE,
   COPYBOOK_CACHE_CLEARED_INFO,
   COPYBOOKS_FOLDER,
+  E4E_FOLDER,
   ZOWE_FOLDER,
 } from "../constants";
 
@@ -27,33 +26,30 @@ import {
  *
  */
 export function clearCache(uri: vscode.Uri) {
-  vscode.window.setStatusBarMessage(
-    CLEARING_COPYBOOK_CACHE,
-    Promise.resolve().then(
-      () => {
-        const zoweFileUri = uri.with({
-          path: path.join(uri.fsPath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
-        });
-        deleteFolderContent(vscode.Uri.file(zoweFileUri.fsPath));
-        vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
-      },
-      () =>
-        vscode.window.showInformationMessage(
-          "Encountered problem while clearing copybook cache",
-        ),
-    ),
-  );
+  const deletePromise = (async () => {
+    const zowe = await deleteFolderContent(
+      vscode.Uri.joinPath(uri, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+    );
+    const e4e = await deleteFolderContent(
+      vscode.Uri.joinPath(uri, E4E_FOLDER, COPYBOOKS_FOLDER),
+    );
+    const results = await Promise.allSettled([...zowe, ...e4e]);
+    if (results.find((r) => r.status === "rejected"))
+      vscode.window.showInformationMessage(
+        "Encountered problem while clearing copybook cache",
+      );
+    else vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
+  })();
+  vscode.window.setStatusBarMessage(CLEARING_COPYBOOK_CACHE, deletePromise);
+  return deletePromise;
 }
 
-function deleteFolderContent(fileUri: vscode.Uri) {
-  return vscode.workspace.fs
-    .readDirectory(fileUri)
-    .then((value: [string, FileType][]) => {
-      value.forEach((val) => {
-        vscode.workspace.fs.delete(
-          fileUri.with({ path: path.join(fileUri.fsPath, val[0]) }),
-          { recursive: true },
-        );
-      });
-    });
+async function deleteFolderContent(fileUri: vscode.Uri) {
+  const files = await vscode.workspace.fs.readDirectory(fileUri);
+  return files.map(([name, _]) =>
+    vscode.workspace.fs.delete(vscode.Uri.joinPath(fileUri, name), {
+      recursive: true,
+      useTrash: false,
+    }),
+  );
 }

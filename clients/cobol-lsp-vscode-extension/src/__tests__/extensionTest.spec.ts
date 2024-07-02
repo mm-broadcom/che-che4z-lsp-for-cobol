@@ -43,6 +43,9 @@ jest.mock("../services/Settings", () => ({
 }));
 
 Utils.getZoweExplorerAPI = jest.fn();
+jest.mock("../services/copybook/E4ECopybookService", () => ({
+  getE4EAPI: jest.fn(),
+}));
 jest.mock("vscode", () => ({
   commands: {
     registerCommand: jest

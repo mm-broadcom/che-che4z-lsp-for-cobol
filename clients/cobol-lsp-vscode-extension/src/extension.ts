@@ -19,7 +19,7 @@ import { isV1RuntimeDialectDetail } from "./dialect/utils";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
-  COPYBOOKS_FOLDER,
+  E4E_INCOMPATIBLE,
   FAIL_CREATE_COPYBOOK_FOLDER_MSG,
   FAIL_CREATE_GLOBAL_STORAGE_MSG,
   LANGUAGE_ID,
@@ -31,10 +31,6 @@ import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeAc
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
-import {
-  downloadCopybookHandler,
-  resolveCopybookHandler,
-} from "./services/copybook/CopybookMessageHandler";
 import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
@@ -48,6 +44,7 @@ import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
+import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
@@ -60,7 +57,6 @@ const API_VERSION: string = "1.0.0";
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
   outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
-
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
@@ -68,10 +64,27 @@ async function initialize(context: vscode.ExtensionContext) {
     outputChannel.appendLine(message);
     throw Error(message);
   }
+  const maybeE4E = await getE4EAPI();
+  const maybeZowe = await Utils.getZoweExplorerAPI();
   const copyBooksDownloader = new CopybookDownloadService(
     context.globalStorageUri.fsPath,
-    await Utils.getZoweExplorerAPI(),
+    maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
+    maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
+    outputChannel,
   );
+  if (maybeZowe && "futureApi" in maybeZowe) {
+    maybeZowe.futureApi.then((api) => {
+      if (api) copyBooksDownloader.explorerAppeared(api.api);
+    });
+  }
+
+  if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
+  else if ("futureApi" in maybeE4E)
+    maybeE4E.futureApi.then((api) => {
+      if (api) copyBooksDownloader.e4eAppeared(api.api);
+      else outputChannel.appendLine(E4E_INCOMPATIBLE);
+    });
+
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
@@ -141,11 +154,11 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",
-    resolveCopybookHandler.bind(undefined, context.globalStorageUri.fsPath),
+    copyBooksDownloader.makeResolveCopybookHandler(),
   );
   languageClientService.addRequestHandler(
     "copybook/download",
-    downloadCopybookHandler.bind(copyBooksDownloader),
+    copyBooksDownloader.makeCopybookDownloadHandler(),
   );
   languageClientService.addRequestHandler(
     "workspace/configuration",
@@ -309,11 +322,7 @@ function registerCommands(
       "cobol-lsp.open.copybook.internalfolder",
       async () => {
         const copybookFolder = vscode.Uri.file(
-          path.join(
-            context.globalStorageUri.fsPath,
-            ZOWE_FOLDER,
-            COPYBOOKS_FOLDER,
-          ),
+          path.join(context.globalStorageUri.fsPath, ZOWE_FOLDER),
         );
         try {
           await vscode.workspace.fs.createDirectory(copybookFolder);
