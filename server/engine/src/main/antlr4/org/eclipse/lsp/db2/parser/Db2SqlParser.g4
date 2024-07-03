@@ -37,8 +37,9 @@ binary_host_variable_array: dbs_level_02_48 entry_name SQL TYPE IS binary_host_v
 
 xml_host_variable_array: dbs_level_02_48 entry_name SQL TYPE IS XML AS (blob_clob_file | blob_clob_object ) host_variable_array_times;
 
-blob_clob_object: (BLOB | CLOB | DBCLOB | (BINARY | CHAR | CHARACTER) LARGE OBJECT) LPARENCHAR host_variable_array_size (LENGTH_TYPES)? RPARENCHAR;
-blob_clob_file: ((BLOB | CLOB | DBCLOB) MINUSCHAR FILE);
+blob_clob_dbclob_set: BLOB | CLOB | DBCLOB;
+blob_clob_object: (blob_clob_dbclob_set | ((BINARY | CHAR | CHARACTER) LARGE OBJECT)) LPARENCHAR host_variable_array_size (LENGTH_TYPES)? RPARENCHAR;
+blob_clob_file: (blob_clob_dbclob_set MINUSCHAR FILE);
 
 binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
