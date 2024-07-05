@@ -64,7 +64,9 @@ describe("Tests copybook download service", () => {
       await downloadService.downloadCopybooks("document-uri", [
         { name: "copybook-name", dialect: DEFAULT_DIALECT },
       ]);
-      expect((downloadService as any).processDownloadError).toBeCalledWith(
+      expect(
+        (downloadService as any).processDownloadError,
+      ).toHaveBeenCalledWith(
         `${PROVIDE_PROFILE_MSG} Provided invalid profile name: unknown-profile`,
       );
     });
@@ -87,9 +89,9 @@ describe("Tests copybook download service", () => {
       await downloadService.downloadCopybooks("document-uri", [
         { name: "copybook-name", dialect: DEFAULT_DIALECT },
       ]);
-      expect((downloadService as any).processDownloadError).toBeCalledWith(
-        `${PROVIDE_PROFILE_MSG}`,
-      );
+      expect(
+        (downloadService as any).processDownloadError,
+      ).toHaveBeenCalledWith(`${PROVIDE_PROFILE_MSG}`);
     });
 
     it("checks profile with invalid credentials do not trigger download", async () => {

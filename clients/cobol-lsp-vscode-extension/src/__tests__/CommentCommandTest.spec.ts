@@ -161,7 +161,7 @@ describe("Validate ToggleComments", () => {
       edit: jest.fn(),
     } as unknown as vscode.TextEditor;
     new ToggleComments(textEditor, CommentAction.TOGGLE).doIt();
-    expect(textEditor.edit).toBeCalledTimes(0);
+    expect(textEditor.edit).toHaveBeenCalledTimes(0);
   });
 
   // selection[0]
@@ -229,20 +229,20 @@ describe("Validate ToggleComments", () => {
   test("with toggle action", () => {
     new ToggleComments(textEditor, CommentAction.TOGGLE).doIt();
     checkCommonCalls();
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(5, 0, 6, 45),
       "      *01  WS-POINT.\n" +
         "      *    05 WS-POINTER USAGE    IS POINTER.",
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(14, 0, 14, 44),
       "           DISPLAY 'From P1:' BAR of FOOBAR.",
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(20, 0, 20, 33),
       '      *    "LLLLLLLLLLMMMMMMMMMM"',
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(25, 0, 25, 22),
       "      *  debug command",
     );
@@ -251,20 +251,20 @@ describe("Validate ToggleComments", () => {
   test("with comment action", () => {
     new ToggleComments(textEditor, CommentAction.COMMENT).doIt();
     checkCommonCalls();
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(5, 0, 6, 45),
       "      *01  WS-POINT.\n" +
         "      *    05 WS-POINTER USAGE    IS POINTER.",
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(14, 0, 14, 44),
       "      **    DISPLAY 'From P1:' BAR of FOOBAR.",
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(20, 0, 20, 33),
       '      *    "LLLLLLLLLLMMMMMMMMMM"',
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(25, 0, 25, 22),
       "      *  debug command",
     );
@@ -273,32 +273,32 @@ describe("Validate ToggleComments", () => {
   test("with uncomment action", () => {
     new ToggleComments(textEditor, CommentAction.UNCOMMENT).doIt();
     checkCommonCalls();
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(5, 0, 6, 45),
       "       01  WS-POINT.\n" +
         "           05 WS-POINTER USAGE    IS POINTER.",
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(14, 0, 14, 44),
       "           DISPLAY 'From P1:' BAR of FOOBAR.",
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(20, 0, 20, 33),
       '      -    "LLLLLLLLLLMMMMMMMMMM"',
     );
-    expect(editBuilder.replace).toBeCalledWith(
+    expect(editBuilder.replace).toHaveBeenCalledWith(
       getRange(25, 0, 25, 22),
       "      d  debug command",
     );
   });
 
   function checkCommonCalls() {
-    expect(textEditor.document.lineAt).toBeCalledTimes(5);
-    expect(textEditor.document.lineAt).toBeCalledWith(5);
-    expect(textEditor.document.lineAt).toBeCalledWith(6);
-    expect(textEditor.document.lineAt).toBeCalledWith(14);
-    expect(textEditor.edit).toBeCalledTimes(1);
-    expect(editBuilder.replace).toBeCalledTimes(4);
+    expect(textEditor.document.lineAt).toHaveBeenCalledTimes(5);
+    expect(textEditor.document.lineAt).toHaveBeenCalledWith(5);
+    expect(textEditor.document.lineAt).toHaveBeenCalledWith(6);
+    expect(textEditor.document.lineAt).toHaveBeenCalledWith(14);
+    expect(textEditor.edit).toHaveBeenCalledTimes(1);
+    expect(editBuilder.replace).toHaveBeenCalledTimes(4);
   }
 });
 

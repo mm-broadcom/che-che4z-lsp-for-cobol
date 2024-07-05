@@ -105,7 +105,7 @@ describe("SettingsService evaluate variables", () => {
       get: tracking,
     });
     SettingsService.getCopybookLocalPath("PROGRAM", "COBOL");
-    expect(tracking).toBeCalledWith("paths-local");
+    expect(tracking).toHaveBeenCalledWith("paths-local");
   });
 
   test("Get local settings for dialect", () => {
@@ -114,7 +114,7 @@ describe("SettingsService evaluate variables", () => {
       get: tracking,
     });
     SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
-    expect(tracking).toBeCalledWith("maid.paths-local");
+    expect(tracking).toHaveBeenCalledWith("maid.paths-local");
   });
 
   test("Get native build enable settings", () => {
@@ -123,7 +123,7 @@ describe("SettingsService evaluate variables", () => {
       get: tracking,
     });
     SettingsService.serverRuntime();
-    expect(tracking).toBeCalledWith("cobol-lsp.serverRuntime");
+    expect(tracking).toHaveBeenCalledWith("cobol-lsp.serverRuntime");
   });
 });
 

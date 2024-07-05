@@ -122,18 +122,20 @@ describe("Check plugin extension for cobol starts successfully.", () => {
       "Extension activation event was triggered",
     );
 
-    expect(vscode.commands.registerCommand).toBeCalledTimes(10);
+    expect(vscode.commands.registerCommand).toHaveBeenCalledTimes(10);
 
     expect(fetchCopybookCommand).toHaveBeenCalled();
     expect(gotoCopybookSettings).toHaveBeenCalled();
     expect(initSmartTab).toHaveBeenCalled();
 
-    expect(vscode.languages.registerCodeActionsProvider).toBeCalledWith(
+    expect(vscode.languages.registerCodeActionsProvider).toHaveBeenCalledWith(
       { language: "cobol" },
       expect.any(CopybooksCodeActionProvider),
     );
 
-    expect(vscode.languages.registerCompletionItemProvider).toBeCalledWith(
+    expect(
+      vscode.languages.registerCompletionItemProvider,
+    ).toHaveBeenCalledWith(
       { language: "cobol" },
       expect.any(SnippetCompletionProvider),
     );

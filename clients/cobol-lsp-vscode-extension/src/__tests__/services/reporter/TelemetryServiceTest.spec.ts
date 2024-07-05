@@ -46,10 +46,12 @@ function runScenario(
       undefined,
       telemetryMeasurements,
     );
-    expect(spySendTelemetry).toBeCalledTimes(expectedNumberOfCalls);
+    expect(spySendTelemetry).toHaveBeenCalledTimes(expectedNumberOfCalls);
   } else {
     TelemetryService.registerExceptionEvent(eventName, rootCause!, categories);
-    expect(spySendExceptionTelemetry).toBeCalledTimes(expectedNumberOfCalls);
+    expect(spySendExceptionTelemetry).toHaveBeenCalledTimes(
+      expectedNumberOfCalls,
+    );
   }
 }
 

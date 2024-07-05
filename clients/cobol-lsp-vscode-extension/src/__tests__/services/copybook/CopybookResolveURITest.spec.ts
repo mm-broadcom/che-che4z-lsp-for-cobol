@@ -268,7 +268,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
       "COBOL",
     );
     expect(uri).toMatch(CPY_FOLDER_NAME);
-    expect(spySearchInWorkspace).toBeCalledTimes(1);
+    expect(spySearchInWorkspace).toHaveBeenCalledTimes(1);
     (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
   test("With no settings provided, two search strategies are applied and function return undefined", async () => {
@@ -318,7 +318,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
       "DIALECT",
     );
     expect(uri).toMatch(CPY_FOLDER_NAME);
-    expect(spySearchInWorkspace).toBeCalledTimes(1);
+    expect(spySearchInWorkspace).toHaveBeenCalledTimes(1);
     (globSync as any) = jest.fn().mockReturnValue((x: any) => x);
   });
 });

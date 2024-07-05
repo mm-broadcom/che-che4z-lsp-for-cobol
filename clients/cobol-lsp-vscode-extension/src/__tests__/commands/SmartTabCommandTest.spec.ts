@@ -39,7 +39,7 @@ beforeEach(() => {
 test("Test initSmartTab calls registerTextEditorCommand to bind 'tab button functionality' keys", () => {
   expect(initSmartTab).toBeTruthy();
   initSmartTab(context);
-  expect(vscode.commands.registerTextEditorCommand).toBeCalledTimes(2);
+  expect(vscode.commands.registerTextEditorCommand).toHaveBeenCalledTimes(2);
 });
 
 test("Default rule was choosen for empty rule list", () => {

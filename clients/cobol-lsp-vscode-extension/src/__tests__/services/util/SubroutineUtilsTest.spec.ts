@@ -29,7 +29,7 @@ describe("SubroutineUtils", () => {
 
     const uri = resolveSubroutineURI("/storagePath", "name");
     expect(uri).toBe("theURI");
-    expect(searchCopybookInExtensionFolder).toBeCalledWith(
+    expect(searchCopybookInExtensionFolder).toHaveBeenCalledWith(
       "name",
       folders,
       COBOL_EXT_ARRAY,
