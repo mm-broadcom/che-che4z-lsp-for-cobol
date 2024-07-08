@@ -20,7 +20,7 @@ jest.mock("../../../services/reporter/TelemetryService");
 describe("Tests the server code actions", () => {
   it("checks that no code action is provided when diagnostics is empty", async () => {
     const codeActionProvider = new ServerRuntimeCodeActionProvider();
-    const { doc, context, token } = getCodeactionMockObjects([]);
+    const { doc, context, token } = getCodeActionMockObjects([]);
     const codeActions = await codeActionProvider.provideCodeActions(
       doc,
       new Range(),
@@ -32,7 +32,7 @@ describe("Tests the server code actions", () => {
 
   it("checks that no code action is provided when diagnostics is a syntax error and not a setup  issue", async () => {
     const codeActionProvider = new ServerRuntimeCodeActionProvider();
-    const { doc, context, token } = getCodeactionMockObjects([
+    const { doc, context, token } = getCodeActionMockObjects([
       {
         range: new Range(),
         message: "some syntax error",
@@ -51,7 +51,7 @@ describe("Tests the server code actions", () => {
 
   it("checks that code actions are provided when the diagnostics are related to the server type configuration", async () => {
     const codeActionProvider = new ServerRuntimeCodeActionProvider();
-    const { doc, context, token } = getCodeactionMockObjects([
+    const { doc, context, token } = getCodeActionMockObjects([
       {
         range: new Range(),
         message: "server configuration error",
@@ -73,7 +73,7 @@ describe("Tests the server code actions", () => {
   });
 });
 
-function getCodeactionMockObjects(diagnostics: vscode.Diagnostic[]) {
+function getCodeActionMockObjects(diagnostics: vscode.Diagnostic[]) {
   const doc = {
     uri: { fsPath: "ws-path" },
     fileName: "test-file",

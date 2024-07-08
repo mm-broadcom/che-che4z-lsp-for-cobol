@@ -38,7 +38,7 @@ describe("Tests Copybook download from DNS", () => {
     jest.clearAllMocks();
   });
 
-  describe("checks if the copybook is eligible to dowload passed on user settings", () => {
+  describe("checks if the copybook is eligible to download passed on user settings", () => {
     const downloader = new CopybookDownloaderForDsn(
       "storage-path",
       zoweExplorerMock,
@@ -94,22 +94,22 @@ describe("Tests Copybook download from DNS", () => {
     );
     it("checks not eligible copybook are not downloaded", async () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(false);
-      const isDowloaded = await downloader.downloadCopybook(
+      const isDownloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "DNS.PATH",
       );
-      expect(isDowloaded).toBeFalsy();
+      expect(isDownloaded).toBeFalsy();
     });
 
     it("checks eligible copybook which are not present in the DSN provided do not invoke ZE Api's", async () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
-      const isDowloaded = await downloader.downloadCopybook(
+      const isDownloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "DNS.PATH",
       );
-      expect(isDowloaded).toBeFalsy();
+      expect(isDownloaded).toBeFalsy();
     });
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {
@@ -129,7 +129,7 @@ describe("Tests Copybook download from DNS", () => {
 
       it("checks appropriate call for ZE API's", async () => {
         downloader.clearMemberListCache();
-        const isDowloaded = await downloader.downloadCopybook(
+        const isDownloaded = await downloader.downloadCopybook(
           { name: "copybook", dialect: "COBOL" },
           "document-uri",
           "DNS.PATH",
@@ -141,12 +141,12 @@ describe("Tests Copybook download from DNS", () => {
           returnEtag: true,
           encoding: "utf8",
         });
-        expect(isDowloaded).toBeTruthy();
+        expect(isDownloaded).toBeTruthy();
       });
 
-      it("checks cache is used if download is trigged again for same profile and dataset", async () => {
+      it("checks cache is used if download is triggered again for same profile and dataset", async () => {
         // trigger download again and check cache impl
-        const isDowloaded = await downloader.downloadCopybook(
+        const isDownloaded = await downloader.downloadCopybook(
           { name: "copybook", dialect: "COBOL" },
           "document-uri",
           "DNS.PATH",
@@ -159,7 +159,7 @@ describe("Tests Copybook download from DNS", () => {
           returnEtag: true,
           encoding: "utf8",
         });
-        expect(isDowloaded).toBeTruthy();
+        expect(isDownloaded).toBeTruthy();
       });
     });
   });

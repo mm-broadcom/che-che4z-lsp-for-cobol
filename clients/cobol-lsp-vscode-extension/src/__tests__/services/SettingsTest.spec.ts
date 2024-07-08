@@ -140,7 +140,7 @@ test("json validation", () => {
 });
 
 describe("SettingsService returns correct tab settings", () => {
-  test("Returns default tab settigs for boolean value", () => {
+  test("Returns default tab settings for boolean value", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(true),
     });
@@ -149,7 +149,7 @@ describe("SettingsService returns correct tab settings", () => {
     expect(tabSettings.defaultRule.maxPosition).toBe(72);
   });
 
-  test("Max position is the last threashold position for array", () => {
+  test("Max position is the last threshold position for array", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue([1, 3, 5, 7, 25]),
     });
@@ -226,7 +226,7 @@ describe("SettingsService prepares local search folders", () => {
       ]),
     ).toEqual([makefsPath("/absolute"), makefsPath("/workspacePath/relative")]);
   });
-  test("all workspace paths concatanated into relative paths", () => {
+  test("all workspace paths concatenated into relative paths", () => {
     const paths = [makefsPath("/absolute"), "relative"];
     expect(
       SettingsService.prepareLocalSearchFolders(paths, [

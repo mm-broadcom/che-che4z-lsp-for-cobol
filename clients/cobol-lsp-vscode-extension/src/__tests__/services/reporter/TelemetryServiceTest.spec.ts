@@ -92,7 +92,7 @@ describe("TelemetryService information are consistent before send them to the te
     });
   });
 
-  test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server with manuplated starttime", () => {
+  test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server with manipulated start time", () => {
     const startTime: number = Date.now();
     runScenario(1, "log", "test the download", undefined, undefined, {
       "time elapsed": TelemetryService.calculateTimeElapsed(

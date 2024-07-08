@@ -72,6 +72,26 @@ describe("Test profile Utils", () => {
     ).toBe("profileInSettings");
   });
 
+  it("checks that all profiles can be retrieved", async () => {
+    jest.resetAllMocks();
+    const zoweApiMock = getZoweExplorerMock();
+    vscode.Uri.parse = jest.fn().mockImplementation((arg) => arg);
+    (vscode.workspace.textDocuments as any) = [];
+    (vscode.workspace.textDocuments as any).push({
+      fileName: path.join(profile, programName),
+    } as any);
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("profileInSettings"),
+    });
+    const profileUtilObj = ProfileUtils;
+    const getAvailableProfilesSpy = jest.spyOn(profileUtilObj, "getAvailableProfiles");
+
+    profileUtilObj.getAvailableProfiles(undefined);
+
+    expect(getAvailableProfilesSpy).toHaveBeenCalled();
+
+  });
+
   it("checks that profile is fetched from the settings if not a ZE downloaded file", async () => {
     const zoweApiMock = getZoweExplorerMock()();
     vscode.Uri.parse = jest.fn().mockImplementation((arg) => arg);

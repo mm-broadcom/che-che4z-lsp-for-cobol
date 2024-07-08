@@ -26,7 +26,7 @@ Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: {} });
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
 
-test("Test fetchCopybookCommand calls telementry services and copybook download service with proper input", async () => {
+test("Test fetchCopybookCommand calls telemetry services and copybook download service with proper input", async () => {
   const copybookDownloadService: CopybookDownloadService =
     new CopybookDownloadService(
       "./storage-path",

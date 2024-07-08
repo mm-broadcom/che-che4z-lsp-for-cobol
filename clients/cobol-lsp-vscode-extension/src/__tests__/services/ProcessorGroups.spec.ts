@@ -125,7 +125,7 @@ it("Processor groups configuration provides lib path", () => {
   expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
 });
 
-it("Processor groups configuration understend absolute paths", () => {
+it("Processor groups configuration understand absolute paths", () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/abs/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",

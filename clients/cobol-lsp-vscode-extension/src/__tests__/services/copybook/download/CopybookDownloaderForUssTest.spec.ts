@@ -38,7 +38,7 @@ describe("Tests Copybook download from USS", () => {
     jest.clearAllMocks();
   });
 
-  describe("checks if the copybook is eligible to dowload passed on user settings", () => {
+  describe("checks if the copybook is eligible to download passed on user settings", () => {
     const downloader = new CopybookDownloaderForUss(
       "storage-path",
       zoweExplorerMock,
@@ -94,22 +94,22 @@ describe("Tests Copybook download from USS", () => {
     );
     it("checks not eligible copybook are not downloaded", async () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(false);
-      const isDowloaded = await downloader.downloadCopybook(
+      const isDownloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "/uss/path",
       );
-      expect(isDowloaded).toBeFalsy();
+      expect(isDownloaded).toBeFalsy();
     });
 
     it("checks eligible copybook which are not present in the DSN provided do not invoke ZE Api's", async () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
-      const isDowloaded = await downloader.downloadCopybook(
+      const isDownloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "/uss/path",
       );
-      expect(isDowloaded).toBeFalsy();
+      expect(isDownloaded).toBeFalsy();
     });
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {
@@ -129,7 +129,7 @@ describe("Tests Copybook download from USS", () => {
 
       it("checks appropriate invokation of ZE API's", async () => {
         downloader.clearMemberListCache();
-        const isDowloaded = await downloader.downloadCopybook(
+        const isDownloaded = await downloader.downloadCopybook(
           { name: "uss_copybook", dialect: "COBOL" },
           "document-uri",
           "/uss/path",
@@ -144,11 +144,11 @@ describe("Tests Copybook download from USS", () => {
             returnEtag: true,
           },
         );
-        expect(isDowloaded).toBeTruthy();
+        expect(isDownloaded).toBeTruthy();
       });
 
       it("checks cache is used if download is trigged again for same profile and uss path", async () => {
-        const isDowloaded = await downloader.downloadCopybook(
+        const isDownloaded = await downloader.downloadCopybook(
           { name: "uss_copybook", dialect: "COBOL" },
           "document-uri",
           "/uss/path",
@@ -164,7 +164,7 @@ describe("Tests Copybook download from USS", () => {
             returnEtag: true,
           },
         );
-        expect(isDowloaded).toBeTruthy();
+        expect(isDownloaded).toBeTruthy();
       });
     });
   });

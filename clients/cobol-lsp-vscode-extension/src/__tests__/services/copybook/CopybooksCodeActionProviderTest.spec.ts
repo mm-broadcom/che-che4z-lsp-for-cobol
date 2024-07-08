@@ -51,7 +51,7 @@ describe("Test Copybook code action provider", () => {
     jest.clearAllMocks();
   });
 
-  test("code action is not triggred when diaognosis not completed", async () => {
+  test("code action is not triggered when diagnosis not completed", async () => {
     const context = { triggerKind: {}, diagnostics: [], only: undefined };
     expect(
       (
@@ -65,7 +65,7 @@ describe("Test Copybook code action provider", () => {
     ).toBe(0);
   });
 
-  test("code action is not triggred even if diaognosis is completed with code different then `missing copybook` ", async () => {
+  test("code action is not triggered even if diagnosis is completed with code different then `missing copybook` ", async () => {
     const context = {
       triggerKind: {},
       diagnostics: [
@@ -91,7 +91,7 @@ describe("Test Copybook code action provider", () => {
     ).toBe(0);
   });
 
-  test("code action is triggred when diaognosis completed and diaognis code is `missing copybook`", async () => {
+  test("code action is triggered when diagnosis completed and diagnosis code is `missing copybook`", async () => {
     const context = {
       triggerKind: {},
       diagnostics: [
