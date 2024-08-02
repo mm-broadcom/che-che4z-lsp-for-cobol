@@ -12,11 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { LANGUAGE_ID } from "../../constants";
+import { LANGUAGE_ID, SETTINGS_DIALECT } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
-import { SettingsService } from "../Settings";
-import { readFileSync } from "node:fs";
-
+import snippetFile = require("./cobolSnippets.json");
 const SNIPPETS: Map<string, Map<any, any>> = new Map();
 
 export class SnippetCompletionProvider
@@ -32,12 +30,12 @@ export class SnippetCompletionProvider
     context: vscode.CompletionContext,
   ): Promise<vscode.CompletionItem[]> {
     var textUptoCursor = getCurrentLineText(document, position);
-    const wordsUptoCursor = fetchWordsList(textUptoCursor);
-
+    const wordsUptoCursor = fetchWordsList(textUptoCursor ?? "");
     this.resetList();
-    const snippets: Map<any, any> = await getSnippets();
+    const snippets: Map<any, any> = getSnippets();
     snippets.forEach((value, key) => {
-      const prefixList: string[] = fetchWordsList(value.prefix);
+      console.log("In snippet foreach");
+      const prefixList: string[] = fetchWordsList(value.prefix ?? "");
       const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
       matchedWords.length > 0
         ? this.matchingWordsList.push(
@@ -57,37 +55,39 @@ export class SnippetCompletionProvider
   }
 }
 
-async function getSnippets(): Promise<Map<any, any>> {
-  const map = await SettingsService.getSnippetsForCobol();
-  const dialectList = SettingsService.getDialects()!;
-  const registeredDialects = DialectRegistry.getDialects();
-  registeredDialects
-    .filter((d) => dialectList.includes(d.name))
-    .forEach((d) => {
-      var snippets = importSnippet(d.snippetPath);
-      if (snippets !== undefined) {
-        Object.entries(snippets).forEach((value) =>
-          map.set(value[0], value[1]),
-        );
-      }
-    });
+function getDialects(): string[] | undefined {
+  return vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
+}
 
+function getSnippets(): Map<any, any> {
+  const map: Map<any, any> = new Map<any, any>([
+    ...Object.entries(snippetFile),
+  ]);
+  // const dialectList = getDialects()!;
+  // const registeredDialects = DialectRegistry.getDialects();
+  // registeredDialects
+  //   .filter((d) => dialectList.includes(d.name))
+  //   .forEach((d) => {
+  //     console.log("Dialect: " + d.name);
+  //     var snippets = importSnippet(d.snippetPath);
+  //     if (snippets !== undefined) {
+  //       Object.entries(snippets).forEach((value) =>
+  //         map.set(value[0], value[1]),
+  //       );
+  //     }
+  //   });
+
+  const snippets = snippetFile;
+  if (snippets !== undefined) {
+    Object.entries(snippets).forEach((value) => map.set(value[0], value[1]));
+  }
+
+  console.log(map);
   return map;
 }
 
 function importSnippet(snippetPath: string): Map<any, any> | undefined {
-  var result = SNIPPETS.get(snippetPath);
-  if (result === undefined) {
-    try {
-      const json = readFileSync(snippetPath, "utf-8");
-      var snippet = JSON.parse(json);
-      SNIPPETS.set(snippetPath, snippet);
-      result = snippet;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  return result;
+  return JSON.parse(snippetFile.toString());
 }
 
 function createCompletionItem(

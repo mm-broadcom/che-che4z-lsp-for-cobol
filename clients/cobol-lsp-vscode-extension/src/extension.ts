@@ -54,7 +54,7 @@ interface __AnalysisApi {
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
-const API_VERSION: string = "1.0.0";
+export const API_VERSION: string = "1.0.0";
 
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
@@ -205,7 +205,7 @@ export interface DialectDetail {
   snippets: vscode.Uri;
 }
 
-const registerNewDialect = async (
+export const registerNewDialect = async (
   extensionId: string,
   dialect: DialectDetail,
 ) => {
