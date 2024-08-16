@@ -29,6 +29,7 @@ commaSeparator: COMMACHAR | COMMASEPARATOR;
 
 identificationDivision
    : (IDENTIFICATION | ID) DIVISION dot_fs programIdParagraph identificationDivisionBody*
+   | {notifyError("cobolParser.missingIDDivisionHeader");} identificationDivisionBody+
    ;
 
 identificationDivisionBody
@@ -87,6 +88,7 @@ optionalParagraphTermination
 
 environmentDivision
    : ENVIRONMENT DIVISION dot_fs environmentDivisionBody*
+   | {notifyError("cobolParser.missingEnvDivisionHeader");} environmentDivisionBody+
    ;
 
 environmentDivisionBody
@@ -395,6 +397,7 @@ endClause
 
 dataDivision
    : DATA DIVISION dot_fs dataDivisionSection*
+   | {notifyError("cobolParser.missingDataDivisionHeader");} dataDivisionSection+
    ;
 
 dataDivisionSection
@@ -727,6 +730,7 @@ thruToken
 
 procedureDivision
    : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause? dot_fs procedureDeclaratives? procedureDivisionBody
+   | {notifyError("cobolParser.missingProcedureDivisionHeader");} procedureDivisionBody
    ;
 
 procedureDivisionUsingClause
