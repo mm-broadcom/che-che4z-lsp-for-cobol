@@ -333,6 +333,7 @@ PROCEDURE              : P R O C E D U R E {cobolVerbTokens.add(PROCEDURE);};
 PROCEDURE_POINTER      : P R O C E D U R E MINUSCHAR P O I N T E R {cobolVerbTokens.add(PROCEDURE_POINTER);};
 PROCEDURES             : P R O C E D U R E S {cobolVerbTokens.add(PROCEDURES);};
 PROCEED                : P R O C E E D {cobolVerbTokens.add(PROCEED);};
+PROCESS                : P R O C E S S {cobolVerbTokens.add(PROCESS);};
 PROCESSING             : P R O C E S S I N G {cobolVerbTokens.add(PROCESSING); enableCobolSpecialSeparators = false;};
 PROGRAM                : P R O G R A M {cobolVerbTokens.add(PROGRAM);};
 PROGRAM_ID             : P R O G R A M MINUSCHAR I D {cobolVerbTokens.add(PROGRAM_ID);};
