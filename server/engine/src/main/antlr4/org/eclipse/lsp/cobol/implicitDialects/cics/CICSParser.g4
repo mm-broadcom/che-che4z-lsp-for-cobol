@@ -847,7 +847,7 @@ cics_web: WEB (cics_web_close | cics_web_converse | cics_web_endbrowse | cics_we
 
 cics_web_close: CLOSE SESSTOKEN cics_data_value;
 
-cics_web_converse: CLOSE SESSTOKEN cics_data_value cics_web_path_urimap? cics_web_http_call_method (MEDIATYPE cics_data_area)? cics_web_querystring?
+cics_web_converse: CONVERSE SESSTOKEN cics_data_value cics_web_path_urimap? cics_web_http_call_method (MEDIATYPE cics_data_area)? cics_web_querystring?
                    cics_web_body? cics_web_action_expect? cics_web_close_options? cics_web_converse_credentials cics_web_into_set_tocontainer? TOLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE?
                    cics_web_statuscode? cics_web_translation (BODYCHARSET cics_data_area)?;
 
@@ -868,10 +868,9 @@ cics_web_read_formfield: FORMFIELD cics_data_area (NAMELENGTH cics_data_value)? 
 cics_web_read_httpheader: HTTPHEADER cics_data_area NAMELENGTH cics_data_value (SESSTOKEN cics_data_area)? VALUE cics_data_area VALUELENGTH cics_data_area;
 cics_web_read_queryparm: QUERYPARM cics_data_value (NAMELENGTH cics_data_value)? (VALUE cics_data_area | SET ptr_ref) VALUELENGTH cics_data_area (HOSTCODEPAGE cics_data_value)?;
 
-cics_web_readnext: READNEXT (cics_web_readnext_formfield | cics_web_readnext_httpheader | cics_web_readnext_queryparm);
-cics_web_readnext_formfield: FORMFIELD cics_data_area NAMELENGTH cics_data_value VALUE cics_data_area VALUELENGTH cics_data_area;
+cics_web_readnext: READNEXT (cics_web_readnext_formfield_queryparm | cics_web_readnext_httpheader);
+cics_web_readnext_formfield_queryparm: (FORMFIELD | QUERYPARM) cics_data_area NAMELENGTH cics_data_value VALUE cics_data_area VALUELENGTH cics_data_area;
 cics_web_readnext_httpheader: HTTPHEADER cics_data_area NAMELENGTH cics_data_area (SESSTOKEN cics_data_value)? VALUE cics_data_area VALUELENGTH cics_data_area;
-cics_web_readnext_queryparm: QUERYPARM cics_data_area NAMELENGTH cics_data_value VALUE cics_data_area VALUELENGTH cics_data_area; // Very similar to readnext_formfield!
 
 cics_web_receive: RECEIVE (cics_web_receive_server_buffer | cics_web_receive_server_container | cics_web_receive_client);
 cics_web_receive_server_buffer: cics_web_into_set LENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? (TYPE cics_cvda)? cics_web_server_convert?
