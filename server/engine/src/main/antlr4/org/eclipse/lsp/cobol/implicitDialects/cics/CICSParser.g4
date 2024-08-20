@@ -912,9 +912,6 @@ cics_web_container: CONTAINER cics_data_value (CHANNEL cics_data_value)?;
 cics_web_action_expect: (ACTION cics_cvda | EXPECT);
 cics_web_close_options: (CLOSE | NOCLOSE | CLOSESTATUS cics_cvda);
 
-cics_web_converse_credentials: (cics_web_client_auth_type cics_web_auth_username)? cics_web_auth_password;
-cics_web_server_client_credentials: (cics_web_client_auth_type cics_web_auth_username_password?) | cics_web_auth_username_password;
-
 cics_web_into_set_tocontainer: (INTO cics_data_area | SET ptr_ref | TOCONTAINER cics_data_value (TOCHANNEL cics_data_value)?);
 cics_web_statuscode: STATUSCODE cics_data_area STATUSTEXT cics_data_area STATUSLEN cics_data_value;
 
@@ -924,11 +921,14 @@ cics_web_host: HOST cics_data_area HOSTLENGTH cics_data_value;
 cics_web_host_hosttype: cics_web_host (HOSTTYPE cics_cvda)?;
 cics_web_host_portnumber: cics_web_host PORTNUMBER cics_data_value SCHEME cics_cvda;
 cics_web_httpmethod: HTTPMETHOD cics_data_area METHODLENGTH cics_data_area;
-cics_web_httpversion: HTTPVERSION cics_data_area VERSIONLENGTH cics_data_area;
+cics_web_httpversion: HTTPVERSION cics_data_area VERSIONLEN cics_data_area;
 cics_web_realm: REALM cics_data_area REALMLEN cics_data_area;
 cics_web_open_deprecated: (CIPHERS cics_data_value)? (NUMCIPHERS cics_data_value)?;
 
 cics_web_into_set: (INTO cics_data_area | SET ptr_ref);
+
+cics_web_converse_credentials: (cics_web_client_auth_type cics_web_auth_username)? cics_web_auth_password;
+cics_web_server_client_credentials: (cics_web_client_auth_type cics_web_auth_username_password?) | cics_web_auth_username_password;
 cics_web_server_convert: (SRVCONVERT | NOSRVCONVERT | SERVERCONV cics_cvda);
 cics_web_client_convert: (CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda);
 cics_web_client_auth_type: (NONE | BASICAUTH | AUTHENTICATE cics_cvda);
