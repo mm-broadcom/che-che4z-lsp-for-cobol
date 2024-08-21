@@ -35,11 +35,12 @@ class TestProcessCbl {
           + "       CBL NOAWO, AWO\n"
           + "             PROCESS NOAWO, AWO\n"
           + "       Identification Division.\n"
-          + "       Program-id. DEMO.";
+          + "       Program-id. DEMO.\n"
+          + "       PROCEDURE DIVISION.";
 
   private static final String PREFIX = "PROCESS ";
   private static final String SUFFIX =
-      "\n       Identification Division.\n       Program-id. DEMO.";
+      "\n       Identification Division.\n       Program-id. DEMO.\n       PROCEDURE DIVISION.";
 
   private static Stream<String> getOptions() {
     return Stream.of(

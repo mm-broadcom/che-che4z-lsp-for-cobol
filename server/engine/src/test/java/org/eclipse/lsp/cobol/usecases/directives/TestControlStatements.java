@@ -29,7 +29,8 @@ import java.util.stream.Stream;
 class TestControlStatements {
   private static final String TEXT = "       CBL %s\n"
           + "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. A.";
+          + "       PROGRAM-ID A.\n"
+          + "       PROCEDURE DIVISION.";
 
   @ParameterizedTest
   @MethodSource("listDirectives")
