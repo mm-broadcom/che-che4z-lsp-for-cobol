@@ -435,7 +435,7 @@ cics_formattime: FORMATTIME (ABSTIME cics_data_area | DATE cics_data_area | FULL
 cics_formattime_time: (TIME cics_data_area | (TIMESEP (cics_data_area)?))+;
 
 /** FREE (all of them) */
-cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | CHILD cics_data_value | cics_handle_response)*;
+cics_free: FREE ((CONVID | SESSION) cics_name | STATE cics_cvda | CHILD cics_data_value | cics_handle_response)*;
 
 /** FREEMAIN */
 cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
