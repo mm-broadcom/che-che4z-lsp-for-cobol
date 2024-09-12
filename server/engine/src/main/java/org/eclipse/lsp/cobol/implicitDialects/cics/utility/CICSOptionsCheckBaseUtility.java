@@ -121,6 +121,37 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   /**
+   * Helper function to check and see if more than one rule was visited out of a set provided.
+   *
+   * @param options Options checked to insert into error message
+   * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
+   * @param <E> Generic type to allow cross-rule context collection.
+   */
+  @SafeVarargs
+  protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
+    boolean priorRuleSeen = false;
+    for (E rule : rules) {
+      if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
+        if (!((ParserRuleContext) rule).isEmpty()) {
+          if (priorRuleSeen) {
+            throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive.", ((ParserRuleContext) rule).getText());
+            break;
+          }
+          priorRuleSeen = true;
+        }
+      } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        if (!((TerminalNode) rule).getText().isEmpty()) {
+          if (priorRuleSeen) {
+            throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive.", ((TerminalNode) rule).getText());
+            break;
+          }
+          priorRuleSeen = true;
+        }
+      }
+    }
+  }
+
+  /**
    * Iterates over the provided response handlers, extracts what is provided, and validates there is
    * not RESP2 without RESP
    *
