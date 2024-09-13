@@ -129,24 +129,22 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   @SafeVarargs
   protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
-    boolean priorRuleSeen = false;
+    int rulesSeen = 0;
+
     for (E rule : rules) {
       if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
         if (!((ParserRuleContext) rule).isEmpty()) {
-          if (priorRuleSeen) {
-            throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive.", ((ParserRuleContext) rule).getText());
-            break;
-          }
-          priorRuleSeen = true;
+          rulesSeen++;
         }
       } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
         if (!((TerminalNode) rule).getText().isEmpty()) {
-          if (priorRuleSeen) {
-            throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive.", ((TerminalNode) rule).getText());
-            break;
-          }
-          priorRuleSeen = true;
+          rulesSeen++;
         }
+      }
+
+      if (rulesSeen > 1) {
+        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive.", "");
+        break;
       }
     }
   }
