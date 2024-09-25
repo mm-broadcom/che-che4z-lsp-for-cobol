@@ -314,7 +314,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param options Options checked to insert into error message
    */
   protected void checkHasIllegalOptions(TerminalNode rule, String options) {
-    if (!rule.getText().isEmpty()) {
+    if (rule != null) {
       throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
     }
   }
