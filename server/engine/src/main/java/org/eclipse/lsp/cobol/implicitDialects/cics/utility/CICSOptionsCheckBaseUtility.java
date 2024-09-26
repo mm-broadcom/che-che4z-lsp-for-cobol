@@ -335,7 +335,28 @@ public abstract class CICSOptionsCheckBaseUtility {
     int rulesSeen = 0;
 
     for (E rule : rules) {
-      if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
+      if (rule == null) {
+        continue;
+      }
+
+      TerminalNode tempNode = null;
+      boolean ruleIsList = false;
+
+      if (rule instanceof List<?>) {
+          List<?> tempList = (List<?>) rule;
+          if (tempList.stream().allMatch(TerminalNode.class::isInstance)) {
+              List<TerminalNode> tempTerminalList = (List<TerminalNode>) tempList; // Is checked in the if-statement above
+              for (TerminalNode terminalNode : tempTerminalList) {
+                int oldRulesSeen = rulesSeen;
+                rulesSeen = checkSingleRule(rulesSeen, terminalNode);
+                if (rulesSeen > oldRulesSeen) {
+                  tempNode = terminalNode;
+                  ruleIsList = true;
+                  break;
+                }
+              }
+          }
+      } else if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
         if (!((ParserRuleContext) rule).isEmpty()) {
           rulesSeen++;
         }
@@ -346,13 +367,25 @@ public abstract class CICSOptionsCheckBaseUtility {
       }
 
       if (rulesSeen > 1) {
-        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive, ", "");
+        throwException(ErrorSeverity.ERROR, getLocality(ruleIsList ? tempNode : rule), "Options \"" + options + "\" are mutually exclusive.", "");
         break;
       }
     }
   }
 
+  private <E> int checkSingleRule(int rulesSeen, E rule) {
+    if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
+      if (!((ParserRuleContext) rule).isEmpty()) {
+        rulesSeen++;
+      }
+    } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+      if (!((TerminalNode) rule).getText().isEmpty()) {
+        rulesSeen++;
+      }
+    }
 
+    return rulesSeen;
+  }
 
   protected <E extends ParseTree> void checkHasExactlyOneOption(
           String options, ParserRuleContext parentCtx, List<E>... rules) {
