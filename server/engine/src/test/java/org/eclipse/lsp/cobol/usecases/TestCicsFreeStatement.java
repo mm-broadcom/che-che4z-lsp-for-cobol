@@ -54,6 +54,8 @@ public class TestCicsFreeStatement {
     private static final String FREE_MRO_VALID = "FREE SESSION(123) STATE(123)";
     private static final String FREE_CHILD_VALID = "FREE CHILD(123)";
 
+    private static final String FREE_CHILD_INVALID = "FREE CHILD(123) {STATE|errorOne}(123)";
+
     // Utility Functions
     private static void noErrorTest(String newCommand) {
         UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
@@ -86,5 +88,10 @@ public class TestCicsFreeStatement {
         noErrorTest(FREE_LU61_VALID);
         noErrorTest(FREE_MRO_VALID);
         noErrorTest(FREE_CHILD_VALID);
+    }
+
+    @Test
+    void testFreeInvalid() {
+        errorTest(FREE_CHILD_INVALID, "Options \"CHILD or STATE\" are mutually exclusive.");
     }
 }

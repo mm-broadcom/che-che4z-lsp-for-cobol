@@ -53,7 +53,17 @@ public class CICSFreeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        if (ctx.getRuleIndex() == CICSParser.RULE_cics_free_subgroup) {
+            checkFreeSubgroup((CICSParser.Cics_free_subgroupContext) ctx);
+        }
+
         checkDuplicates(ctx);
     }
 
+
+    private void checkFreeSubgroup(CICSParser.Cics_free_subgroupContext ctx) {
+        checkMutuallyExclusiveOptions("CHILD or CONVID", ctx.CHILD(), ctx.CONVID());
+        checkMutuallyExclusiveOptions("CHILD or SESSION", ctx.CHILD(), ctx.SESSION());
+        checkMutuallyExclusiveOptions("CHILD or STATE", ctx.CHILD(), ctx.STATE());
+    }
 }

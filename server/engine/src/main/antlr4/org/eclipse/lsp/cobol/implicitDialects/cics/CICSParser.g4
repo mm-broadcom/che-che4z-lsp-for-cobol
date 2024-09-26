@@ -392,9 +392,8 @@ cics_formattime: FORMATTIME (ABSTIME cics_data_area | DATE cics_data_area | FULL
 cics_formattime_time: (TIME cics_data_area | (TIMESEP (cics_data_area)?))+;
 
 /** FREE (all of them) */
-cics_free: FREE (cics_free_nonChild | cics_free_child | cics_handle_response)*;
-cics_free_nonChild: (CONVID cics_name | SESSION cics_name | STATE cics_cvda)+;
-cics_free_child: CHILD cics_data_value;
+cics_free: FREE (cics_free_subgroup | cics_handle_response)*;
+cics_free_subgroup: (CHILD cics_data_value | CONVID cics_name | SESSION cics_name | STATE cics_cvda)+;
 
 /** FREEMAIN */
 cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
