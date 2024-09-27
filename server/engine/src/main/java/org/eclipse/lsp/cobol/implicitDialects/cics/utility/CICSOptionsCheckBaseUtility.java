@@ -356,14 +356,8 @@ public abstract class CICSOptionsCheckBaseUtility {
                 }
               }
           }
-      } else if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
-        if (!((ParserRuleContext) rule).isEmpty()) {
-          rulesSeen++;
-        }
-      } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
-        if (!((TerminalNode) rule).getText().isEmpty()) {
-          rulesSeen++;
-        }
+      } else {
+        rulesSeen = checkSingleRule(rulesSeen, rule);
       }
 
       if (rulesSeen > 1) {
