@@ -44,6 +44,9 @@ public class CICSOptionsCheckUtility {
         CICSStartbrowseOptionsCheckUtility.RULE_INDEX, new CICSStartbrowseOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSFreeOptionsCheckUtility.RULE_INDEX, new CICSFreeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSStartOptionsCheckUtility.RULE_INDEX, new CICSStartOptionsCheckUtility(context, errors));
+
   }
 
   /**

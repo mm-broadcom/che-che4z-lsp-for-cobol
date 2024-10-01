@@ -223,6 +223,10 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
+  protected void throwManualException(ErrorSeverity errorSeverity, ParserRuleContext ctx, String message, String wrongToken) {
+      throwException(errorSeverity, VisitorUtility.constructLocality(ctx, context), message, wrongToken);
+  }
+
   /**
    * Checks context passed as parameter for duplicate options by traversing the Parse Tree. Also
    * iterates over the response handler by calling checkResponseHandler(), if the
