@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
@@ -39,30 +40,46 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
-  private final Map<String, ErrorSeverity> baseDuplicateOptions =
-          new HashMap<String, ErrorSeverity>() {
-            {
-              put("ASIS", ErrorSeverity.WARNING);
-              put("BUFFER", ErrorSeverity.WARNING);
-              put("LEAVEKB", ErrorSeverity.WARNING);
-              put("NOTRUNCATE", ErrorSeverity.WARNING);
-              put("NOQUEUE", ErrorSeverity.WARNING);
-              put("NOTRUNCATE", ErrorSeverity.WARNING);
-              // handle response options
-              put("RESP", ErrorSeverity.ERROR);
-              put("RESP2", ErrorSeverity.ERROR);
-              put("WAIT", ErrorSeverity.ERROR);
-              put("NOHANDLE", ErrorSeverity.ERROR);
-            }
-          };
+  private final Map<Integer, ErrorSeverity> baseDuplicateOptions =
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.ASIS, ErrorSeverity.WARNING);
+          put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
+          put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          // handle response options
+          put(CICSLexer.RESP, ErrorSeverity.ERROR);
+          put(CICSLexer.RESP2, ErrorSeverity.ERROR);
+          put(CICSLexer.WAIT, ErrorSeverity.ERROR);
+          put(CICSLexer.NOHANDLE, ErrorSeverity.ERROR);
+        }
+      };
+
+  private final Map<Integer, String> baseDupilicateRulesOptions = new HashMap<Integer, String>() {
+    {
+      put(CICSParser.RULE_cics_into, "INTO or SET");
+    }
+  };
 
   public CICSOptionsCheckBaseUtility(
-          DialectProcessingContext context,
-          List<SyntaxError> errors,
-          Map<String, ErrorSeverity> duplicateOptions) {
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<Integer, ErrorSeverity> duplicateOptions) {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
+  }
+
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<Integer, ErrorSeverity> duplicateOptions,
+      Map<Integer, String> duplicateRulesOptions) {
+    this.context = context;
+    this.errors = errors;
+    this.baseDuplicateOptions.putAll(duplicateOptions);
+    this.baseDupilicateRulesOptions.putAll(duplicateRulesOptions);
   }
 
   /**
@@ -237,22 +254,33 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param duplicateOptions Custom duplicate options to evaluate against
    */
   private void checkDuplicateEntries(
-          ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
+      ParserRuleContext ctx, Set<Integer> entries, Map<Integer, ErrorSeverity> duplicateOptions) {
     List<TerminalNode> children = new ArrayList<>();
     getAllTokenChildren(ctx, children, true);
     children.forEach(
-            child -> {
-              String option = child.getText().toUpperCase();
-              if (duplicateOptions.containsKey(option)) {
-                if (!entries.add(option)) {
-                  throwException(
-                          duplicateOptions.get(option),
-                          getLocality(child),
-                          "Excessive options provided for: ",
-                          option);
-                }
-              }
-            });
+        child -> {
+          int option = child.getSymbol().getType();
+          if (duplicateOptions.containsKey(option)) {
+            if (!entries.add(option)) {
+              throwException(
+                  duplicateOptions.get(option),
+                  getLocality(child),
+                  "Excessive options provided for: ",
+                  child.getSymbol().getText());
+            }
+          }
+        });
+  }
+
+  private void processDuplicateRules(ParserRuleContext ctx, Map<Integer, String> subruleOptions) {
+    Set<Integer> seenRules = new HashSet<>();
+    for (ParserRuleContext child : ctx.getRuleContexts(ParserRuleContext.class)) {
+      int ruleId = child.getRuleIndex();
+      String name = subruleOptions.get(ruleId);
+      if (name == null) continue;
+      if (seenRules.add(ruleId)) continue;
+      throwException(ErrorSeverity.ERROR, getLocality(child), "Options \"" + name + "\" cannot be used more than once in a given command.", "");
+    }
   }
 
   /**
@@ -272,13 +300,22 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param customDuplicateOptions Custom duplicate options to evaluate against
    */
   protected void checkDuplicates(
-          ParserRuleContext ctx, Map<String, ErrorSeverity> customDuplicateOptions) {
-    Set<String> foundEntries = new HashSet<>();
-    Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
-    if (customDuplicateOptions != null) updatedDuplicateOptions.putAll(customDuplicateOptions);
-    checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
+      ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions) {
+    checkDuplicates(ctx, customDuplicateOptions, null);
   }
 
+  protected void checkDuplicates(ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions, Map<Integer, String> customDuplicateRuleOptions) {
+    // Check for duplicate options
+    Set<Integer> foundEntries = new HashSet<>();
+    Map<Integer, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
+    if (customDuplicateOptions != null) updatedDuplicateOptions.putAll(customDuplicateOptions);
+    checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
+
+    // Check for duplicate rules
+    Map<Integer, String> updatedRuleOptions = new HashMap<>(baseDupilicateRulesOptions);
+    if (customDuplicateRuleOptions != null) updatedRuleOptions.putAll(customDuplicateRuleOptions);
+    processDuplicateRules(ctx, updatedRuleOptions);
+  }
   /**
    * Flags errors for rule lists passed as parameters if there are multiple instances of mutually
    * exclusive options.
@@ -411,20 +448,20 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void getAllTokenChildren(
-          ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
+  protected void getAllTokenChildren(
+      ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
     if (ctx.children == null) return;
     ctx.children.forEach(
-            child -> {
-              if (TerminalNode.class.isAssignableFrom(child.getClass())
-                      && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
-                children.add((TerminalNode) child);
-              else if (ParserRuleContext.class.isAssignableFrom(child.getClass())) {
-                if (validateResponseHandler
-                        && child.getClass().getSimpleName().equals("Cics_handle_responseContext"))
-                  checkResponseHandlers((CICSParser.Cics_handle_responseContext) child);
-                getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
-              }
-            });
+        child -> {
+          if (TerminalNode.class.isAssignableFrom(child.getClass())
+              && baseDuplicateOptions.containsKey(((TerminalNode) child).getSymbol().getType()))
+            children.add((TerminalNode) child);
+          else if (ParserRuleContext.class.isAssignableFrom(child.getClass())) {
+            if (validateResponseHandler
+                && child.getClass().getSimpleName().equals("Cics_handle_responseContext"))
+              checkResponseHandlers((CICSParser.Cics_handle_responseContext) child);
+            getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
+          }
+        });
   }
 }
