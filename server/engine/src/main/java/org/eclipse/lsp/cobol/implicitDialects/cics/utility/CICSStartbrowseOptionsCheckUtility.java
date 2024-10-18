@@ -32,7 +32,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     public static final int RULE_INDEX = RULE_cics_startbrowse;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<>();
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<>();
 
     /**
      * Checks CICS Startbrowse rules for required and invalid options

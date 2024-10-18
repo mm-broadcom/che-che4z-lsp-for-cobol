@@ -23,10 +23,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Test CICS START commands. Documentation link: <a
@@ -54,22 +51,15 @@ public class TestCICSStartStatement {
     private static final String START_BREXIT_VALID = "START BREXIT TRANSID({$transidVar}) BRDATA({$brdataVar}) BRDATALENGTH({$brdataLenVar}) USERID(123)";
     private static final String START_CHANNEL_VALID = "START TRANSID(123) CHANNEL(3) USERID(123) SYSID(123) NOCHECK PROTECT";
 
-    private static final String START_INVALID = "START TRANSID(123) INTERVAL(0) {INTERVAL(120110)|errorOne}";
+    private static final String START_INVALID = "START TRANSID(123) INTERVAL(0) {_{INTERVAL|errorOne}(120110)|errorTwo_}";
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
         UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
     }
 
-    private static void errorTest(String newCommand, String errorMessage) {
-        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of(
-                "errorOne",
-                new Diagnostic(
-                        new Range(),
-                        errorMessage,
-                        DiagnosticSeverity.Error,
-                        ErrorSource.PARSING.getText()))
-        );
+    private static void errorTest(String newCommand, HashMap<String, Diagnostic> expectedDiagnostic) {
+        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), expectedDiagnostic);
     }
 
     private static String getTestString(String newCommand) {
@@ -104,7 +94,19 @@ public class TestCICSStartStatement {
     // Invalid Tests
     @Test
     void testStartInvalid() {
-        errorTest(START_INVALID, "Only one time-related block allowed.");
+        HashMap<String, Diagnostic> expectedDiagnostic = new HashMap<>();
+        expectedDiagnostic.put("errorOne", new Diagnostic(
+                new Range(),
+                "Excessive options provided for: INTERVAL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+        expectedDiagnostic.put("errorTwo", new Diagnostic(
+                new Range(),
+                "Options \"Only one time-related block allowed.\" cannot be used more than once in a given command.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+
+        errorTest(START_INVALID, expectedDiagnostic);
     }
 
 }

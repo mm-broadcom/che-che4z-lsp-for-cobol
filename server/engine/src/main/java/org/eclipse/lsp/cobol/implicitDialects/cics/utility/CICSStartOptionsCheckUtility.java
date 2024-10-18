@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,19 +33,25 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_start;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<Integer, ErrorSeverity>() {
         {
-            put("FMH", ErrorSeverity.ERROR);
-            put("INTERVAL", ErrorSeverity.ERROR);
-            put("NOCHECK", ErrorSeverity.ERROR);
-            put("PROTECT", ErrorSeverity.ERROR);
+            put(CICSLexer.FMH, ErrorSeverity.ERROR);
+            put(CICSLexer.INTERVAL, ErrorSeverity.ERROR);
+            put(CICSLexer.NOCHECK, ErrorSeverity.ERROR);
+            put(CICSLexer.PROTECT, ErrorSeverity.ERROR);
+        }
+    };
+
+    protected static final HashMap<Integer, String> DUPLICATE_RULE_OPTIONS = new HashMap<Integer, String>() {
+        {
+            put(CICSParser.RULE_cics_start_time_block, "Only one time-related block allowed.");
         }
     };
 
     public CICSStartOptionsCheckUtility(
         DialectProcessingContext dialectProcessingContext,
         List<SyntaxError> errors) {
-      super(dialectProcessingContext, errors, DUPLICATE_CHECK_OPTIONS);
+        super(dialectProcessingContext, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS);
     }
 
     /** Entrypoint to check CICS START rule options
@@ -75,6 +82,8 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             default:
                 break;
         }
+
+        checkDuplicates(ctx);
     }
 
     private void checkStart(CICSParser.Cics_startContext ctx) {
@@ -86,11 +95,6 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasRequiredOption(ctx.FROM(), ctx.FMH(), ctx, "FMH requires FROM");
 
         checkMutuallyExclusiveOptions("TERMID or USERID", ctx.TERMID(), ctx.USERID());
-        if (!ctx.cics_start_time_block().isEmpty()) {
-            if (ctx.cics_start_time_block().size() > 1) {
-                throwManualException(ErrorSeverity.ERROR, ctx.cics_start_time_block().get(1), "Only one time-related block allowed.", "");
-            }
-        }
     }
 
     private void checkStartAttach(CICSParser.Cics_start_attachContext ctx) {

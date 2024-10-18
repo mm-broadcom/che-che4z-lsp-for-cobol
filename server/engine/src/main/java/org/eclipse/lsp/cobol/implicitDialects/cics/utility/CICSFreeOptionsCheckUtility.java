@@ -32,7 +32,7 @@ public class CICSFreeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_free;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<>();
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<>();
 
     /**
      * Checks CICS FREE rule options.
