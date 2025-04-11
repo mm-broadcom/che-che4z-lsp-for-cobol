@@ -35,6 +35,7 @@ import {
   SETTINGS_LSPCONFIG_SECTION,
   SETTINGS_UNREACHABLE_CODE_SEVERITY,
   SETTINGS_MAXIMUM_VM_COUNT,
+  SERVER_PORT_SET_MSG,
 } from "../constants";
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
@@ -297,6 +298,21 @@ export class SettingsService {
    */
   public static getLspPort(): number | undefined {
     if (vscode.workspace.getConfiguration().get(SERVER_PORT)) {
+      if (vscode.workspace.getConfiguration().get(SERVER_PORT_SET_MSG)) {
+        const actionSettings = "Change settings";
+        vscode.window
+          .showWarningMessage(
+            vscode.workspace.getConfiguration().get(SERVER_PORT_SET_MSG) ?? "",
+            actionSettings,
+          )
+          .then((action) => {
+            if (action === actionSettings) {
+              vscode.commands.executeCommand(
+                "cobol-lsp.cpy-manager.goto-settings",
+              );
+            }
+          });
+      }
       return Number(vscode.workspace.getConfiguration().get(SERVER_PORT));
     }
   }

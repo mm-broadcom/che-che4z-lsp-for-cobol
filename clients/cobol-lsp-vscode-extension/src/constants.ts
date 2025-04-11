@@ -30,6 +30,7 @@ export const SETTINGS_UNREACHABLE_CODE_SEVERITY: string =
 export const SETTINGS_MAXIMUM_VM_COUNT: string = "cobol-lsp.maxVmCount";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
+export const SERVER_PORT_SET_MSG = `Server Port has been manually set. Ensure the server has been started before continuing.`;
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
 export const DIALECT_LIBS = "cobol-lsp.dialect.libs";
 export const PATHS_LOCAL_KEY = "paths-local";
