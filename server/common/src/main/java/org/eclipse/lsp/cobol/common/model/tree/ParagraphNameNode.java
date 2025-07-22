@@ -14,10 +14,16 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -52,5 +58,31 @@ public class ParagraphNameNode extends Node implements DefinedAndUsedStructure, 
         .map(ParagraphNode.class::cast)
         .map(ParagraphNode::getFullVariableDescription)
         .orElse("");
+  }
+
+  /**
+   * Construct an error for that Paragraph
+   *
+   * @param messageTemplate a message template for error
+   * @return the error with the variable locality
+   */
+  public SyntaxError getError(MessageTemplate messageTemplate) {
+    return getError(messageTemplate, ERROR);
+  }
+
+  /**
+   * Construct an error for that Variable
+   *
+   * @param messageTemplate a message template for error
+   * @param severity severity of the error
+   * @return the error with the variable locality
+   */
+  public SyntaxError getError(MessageTemplate messageTemplate, ErrorSeverity severity) {
+    return SyntaxError.syntaxError()
+        .errorSource(ErrorSource.PARSING)
+        .severity(severity)
+        .location(this.getLocality().toOriginalLocation())
+        .messageTemplate(messageTemplate)
+        .build();
   }
 }
