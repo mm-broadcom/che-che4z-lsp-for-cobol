@@ -360,8 +360,6 @@ public class TransformTreeStage
     ctx.register(v, StandAloneDataItemNode.class, variableNameCheck);
     ctx.register(v, TableDataNameNode.class, variableNameCheck);
 
-    ctx.register(v, ParagraphNameNode.class, new ParagraphNameCheck());
-
     ctx.register(v, StatementNode.class, new StatementValidate());
 
     ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
