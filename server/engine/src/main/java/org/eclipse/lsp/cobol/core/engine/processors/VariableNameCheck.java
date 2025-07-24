@@ -68,7 +68,7 @@ public class VariableNameCheck implements Processor<VariableWithLevelNode> {
                           SyntaxError err =
                               paragraphNameNode.getError(
                                   MessageTemplate.of(
-                                      "paragraphNameCheck.notAllowedVariableName",
+                                      "paragraphNameCheck.notAllowedParagraphName",
                                       paragraphNameNode.getName()));
                           processingContext.getErrors().add(err);
                         }
